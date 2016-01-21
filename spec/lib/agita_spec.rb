@@ -48,7 +48,6 @@ RSpec.describe Agita do
       end
     end
   end
-
   context '#ensure_status' do
     context 'with correct status' do
       it 'does not raise' do
@@ -110,6 +109,90 @@ RSpec.describe Agita do
     end
     it "returns output of 'git status --branch --porcelain --long' as array" do
       expect(subject.status).to eq(status_array)
+    end
+  end
+  context '#commit' do
+    let(:test_file) { 'test_file' }
+    let(:message) { 'commit message' }
+    shared_examples :truthy do
+      it 'commits file' do
+        subject.commit(test_file, message)
+        expect(run("git status --porcelain #{test_file}")).to be_empty
+        expect(run("git log")).to include(message)
+      end
+      it 'returns true' do
+        expect(subject.commit(test_file, message)).to be_truthy
+      end
+    end
+    shared_examples :falsey do
+      it 'returns true' do
+        expect(subject.commit(test_file, message)).to be_falsey
+      end
+    end
+    context 'file not found' do
+      include_examples :falsey
+    end
+    context 'nothing to commit' do
+      before(:example) do
+        FileUtils.touch(test_file)
+        run 'git add -A'
+        run 'git commit -m dummy'
+      end
+      include_examples :falsey
+    end
+    context 'changes not staged' do
+      before(:example) do
+        FileUtils.touch(test_file)
+        run 'git add -A'
+        run 'git commit -m dummy'
+        File.open(test_file, 'w'){|io| io.write('some new content')}
+      end
+      include_examples :truthy
+    end
+    context 'untracked file' do
+      before(:example) do
+        FileUtils.touch(test_file)
+      end
+      include_examples :truthy
+    end
+  end
+  context '#clean?' do
+    shared_examples :truthy do
+      it 'returns true' do
+        expect(subject.clean?(test_file)).to be_truthy
+      end
+    end
+    shared_examples :falsey do
+      it 'returns true' do
+        expect(subject.clean?(test_file)).to be_falsey
+      end
+    end
+    let(:test_file) { 'test_file' }
+    context 'file not found' do
+      include_examples :truthy
+    end
+    context 'clean file' do
+      before(:example) do
+        FileUtils.touch(test_file)
+        run 'git add -A'
+        run 'git commit -m dummy'
+      end
+      include_examples :truthy
+    end
+    context 'changes not staged' do
+      before(:example) do
+        FileUtils.touch(test_file)
+        run 'git add -A'
+        run 'git commit -m dummy'
+        File.open(test_file, 'w'){|io| io.write('some new content')}
+      end
+      include_examples :falsey
+    end
+    context 'untracked file' do
+      before(:example) do
+        FileUtils.touch(test_file)
+      end
+      include_examples :falsey
     end
   end
 end

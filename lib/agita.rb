@@ -1,3 +1,5 @@
+require 'shellwords'
+
 # Git commands / workflow helper.
 class Agita
 
@@ -26,6 +28,21 @@ class Agita
   # Return Git status (git status --branch --porcelain --long) as an array.
   def status
     run('git status --branch --porcelain --long').split(/\n+/)
+  end
+
+  # Commit path with message.
+  # If there is nothnig to be commited (git status is clean), returns false. Otherwise, does commit and returns true.
+  def commit path, message
+    return false if clean?(path)
+    run "git add #{Shellwords.escape(path)}"
+    run "git commit --quiet -m #{Shellwords.escape(message)}"
+    run "git push --quiet"
+    true
+  end
+
+  # Returns true if path is clean (nothing to commit).
+  def clean? path
+    run("git status --porcelain #{Shellwords.escape(path)}") == ''
   end
 
   private
