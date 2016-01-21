@@ -119,6 +119,7 @@ RSpec.describe Agita do
         subject.commit(test_file, message)
         expect(run("git status --porcelain #{test_file}")).to be_empty
         expect(run("git log")).to include(message)
+        subject.ensure_master_updated_clean # ensure it was pushed
       end
       it 'returns true' do
         expect(subject.commit(test_file, message)).to be_truthy
