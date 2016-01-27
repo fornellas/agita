@@ -112,30 +112,32 @@ RSpec.describe Agita do
     end
   end
   context '#commit' do
-    let(:test_file) { 'test_file' }
+    let(:test_files) { ['file1', 'file2'] }
     let(:message) { 'commit message' }
     shared_examples :truthy do
-      it 'commits file' do
-        subject.commit(test_file, message)
-        expect(run("git status --porcelain #{test_file}")).to be_empty
+      it 'commits files' do
+        subject.commit(message, *test_files)
+        expect(run("git status --porcelain #{test_files.join(' ')}")).to be_empty
         expect(run("git log")).to include(message)
         subject.ensure_master_updated_clean # ensure it was pushed
       end
       it 'returns true' do
-        expect(subject.commit(test_file, message)).to be_truthy
+        expect(subject.commit(message, *test_files)).to be_truthy
       end
     end
     shared_examples :falsey do
-      it 'returns true' do
-        expect(subject.commit(test_file, message)).to be_falsey
+      it 'returns false' do
+        expect(subject.commit(message, *test_files)).to be_falsey
       end
     end
-    context 'file not found' do
+    context 'files not found' do
       include_examples :falsey
     end
     context 'nothing to commit' do
       before(:example) do
-        FileUtils.touch(test_file)
+        test_files.each do |test_file|
+          FileUtils.touch(test_file)
+        end
         run 'git add -A'
         run 'git commit -m dummy'
       end
@@ -143,38 +145,44 @@ RSpec.describe Agita do
     end
     context 'changes not staged' do
       before(:example) do
-        FileUtils.touch(test_file)
+        test_files.each do |test_file|
+          FileUtils.touch(test_file)
+        end
         run 'git add -A'
         run 'git commit -m dummy'
-        File.open(test_file, 'w'){|io| io.write('some new content')}
+        File.open(test_files.first, 'w'){|io| io.write('some new content')}
       end
       include_examples :truthy
     end
-    context 'untracked file' do
+    context 'untracked files' do
       before(:example) do
-        FileUtils.touch(test_file)
+        test_files.each do |test_file|
+          FileUtils.touch(test_file)
+        end
       end
       include_examples :truthy
     end
   end
-  context '#clean?' do
+  fcontext '#clean?' do
     shared_examples :truthy do
       it 'returns true' do
-        expect(subject.clean?(test_file)).to be_truthy
+        expect(subject.clean?(*test_files)).to be_truthy
       end
     end
     shared_examples :falsey do
       it 'returns true' do
-        expect(subject.clean?(test_file)).to be_falsey
+        expect(subject.clean?(*test_files)).to be_falsey
       end
     end
-    let(:test_file) { 'test_file' }
+    let(:test_files) { ['file1', 'file2'] }
     context 'file not found' do
       include_examples :truthy
     end
     context 'clean file' do
       before(:example) do
-        FileUtils.touch(test_file)
+        test_files.each do |test_file|
+          FileUtils.touch(test_file)
+        end
         run 'git add -A'
         run 'git commit -m dummy'
       end
@@ -182,16 +190,18 @@ RSpec.describe Agita do
     end
     context 'changes not staged' do
       before(:example) do
-        FileUtils.touch(test_file)
+        test_files.each do |test_file|
+          FileUtils.touch(test_file)
+        end
         run 'git add -A'
         run 'git commit -m dummy'
-        File.open(test_file, 'w'){|io| io.write('some new content')}
+        File.open(test_files.first, 'w'){|io| io.write('some new content')}
       end
       include_examples :falsey
     end
     context 'untracked file' do
       before(:example) do
-        FileUtils.touch(test_file)
+        FileUtils.touch(test_files.first)
       end
       include_examples :falsey
     end

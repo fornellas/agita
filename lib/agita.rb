@@ -32,17 +32,19 @@ class Agita
 
   # Commit path with message.
   # If there is nothnig to be commited (git status is clean), returns false. Otherwise, does commit and returns true.
-  def commit path, message
-    return false if clean?(path)
-    run "git add #{Shellwords.escape(path)}"
+  def commit message, *paths
+    return false if clean?(*paths)
+    file_list = paths.map { |path| Shellwords.escape(path) }
+    run "git add #{file_list.join(' ')}"
     run "git commit --quiet -m #{Shellwords.escape(message)}"
     run "git push --quiet"
     true
   end
 
   # Returns true if path is clean (nothing to commit).
-  def clean? path
-    run("git status --porcelain #{Shellwords.escape(path)}") == ''
+  def clean? *paths
+    file_list = paths.map { |path| Shellwords.escape(path) }
+    run("git status --porcelain #{file_list.join(' ')}") == ''
   end
 
   private
