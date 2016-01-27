@@ -163,7 +163,7 @@ RSpec.describe Agita do
       include_examples :truthy
     end
   end
-  fcontext '#clean?' do
+  context '#clean?' do
     shared_examples :truthy do
       it 'returns true' do
         expect(subject.clean?(*test_files)).to be_truthy
