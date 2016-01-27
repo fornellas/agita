@@ -47,6 +47,12 @@ class Agita
     run("git status --porcelain #{file_list.join(' ')}") == ''
   end
 
+  # Creates and push an annotated tag
+  def tag tagname, message
+    run("git tag --annotate #{Shellwords.escape(tagname)} --message=#{Shellwords.escape(message)}")
+    run("git push --quiet origin #{Shellwords.escape(tagname)}")
+  end
+
   private
 
   def run command

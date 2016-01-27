@@ -206,4 +206,26 @@ RSpec.describe Agita do
       include_examples :falsey
     end
   end
+  context '#tag' do
+    let(:tagname) { 'tagname' }
+    let(:message) { 'message' }
+    before(:example) do
+      allow(subject).to receive(:run).and_call_original
+    end
+    it 'creates tag' do
+      expect(subject).to receive(:run)
+        .with("git tag --annotate #{tagname} --message=#{message}")
+        .and_call_original
+      expect do
+        subject.tag(tagname, message)
+      end.to change{
+        `git tag --list #{tagname}`.empty?
+      }.from(be_truthy).to(be_falsey)
+    end
+    it 'pushes it' do
+      expect(subject).to receive(:run)
+        .with("git push --quiet origin #{tagname}")
+      subject.tag(tagname, message)
+    end
+  end
 end
