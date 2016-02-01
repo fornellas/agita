@@ -228,4 +228,16 @@ RSpec.describe Agita do
       subject.tag(tagname, message)
     end
   end
+  context '#tags' do
+    let(:tags) { ['tag_a', 'tag_b', 'tag_c'] }
+    before(:example) do
+      tags.each do |tag|
+        run("git tag --annotate #{tag} --message=test_tag")
+      end
+      run("git push --quiet origin --tags")
+    end
+    it 'lists all tags' do
+      expect(subject.tags).to eq(tags)
+    end
+  end
 end
