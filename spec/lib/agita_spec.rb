@@ -240,4 +240,27 @@ RSpec.describe Agita do
       expect(subject.tags).to eq(tags)
     end
   end
+  context '#checkout' do
+    let(:tagname) { 'test_tag' }
+    let(:original_status) do
+      [
+        "On branch master",
+        "Your branch is up-to-date with 'origin/master'.",
+        "nothing to commit, working directory clean"
+      ]
+    end
+    let(:checkedout_status) do
+      ["HEAD detached at test_tag", "nothing to commit, working directory clean"]
+    end
+    before(:example) do
+      run("git tag --annotate #{tagname} --message=RSpec")
+      run("git push --quiet origin #{tagname}")
+    end
+    it 'checks out tag' do
+      expect{subject.checkout(tagname)}
+        .to change{subject.status}
+        .from(original_status)
+        .to(checkedout_status)
+    end
+  end
 end

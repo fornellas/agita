@@ -58,6 +58,11 @@ class Agita
     run("git push --quiet origin #{Shellwords.escape(tagname)}")
   end
 
+  # Checkout tag
+  def checkout tagname
+    run("git checkout --quiet #{Shellwords.escape(tagname)}")
+  end
+
   private
 
   def run command
