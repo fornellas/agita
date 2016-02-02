@@ -111,6 +111,23 @@ RSpec.describe Agita do
       expect(subject.status).to eq(status_array)
     end
   end
+  context '#ensure_master_updated_clean' do
+    context 'at master, updated and clean' do
+      it 'does not raise' do
+        expect{subject.ensure_master_updated_clean}
+          .not_to raise_error
+      end
+    end
+    context 'at other status' do
+      before(:example) do
+        FileUtils.touch('dirt')
+      end
+      it 'raises' do
+        expect{subject.ensure_master_updated_clean}
+          .to raise_error(RuntimeError)
+      end
+    end
+  end
   context '#commit' do
     let(:test_files) { ['file1', 'file2'] }
     let(:message) { 'commit message' }
