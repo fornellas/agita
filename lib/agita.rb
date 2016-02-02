@@ -3,15 +3,6 @@ require 'shellwords'
 # Git commands / workflow helper.
 class Agita
 
-  # Raise RuntimeError unless
-  def ensure_master_updated_clean
-    ensure_status(
-      "On branch master",
-      "Your branch is up-to-date with 'origin/master'.",
-      "nothing to commit, working directory clean"
-    )
-  end
-
   # Raise RuntimeError unless current #status is same as expected_status.
   def ensure_status *expected_status
     current_status = status
@@ -23,6 +14,15 @@ class Agita
         current_status.map{|l| "  #{l}"}.join("\n")
       )
     end
+  end
+
+  # Raise RuntimeError unless
+  def ensure_master_updated_clean
+    ensure_status(
+      "On branch master",
+      "Your branch is up-to-date with 'origin/master'.",
+      "nothing to commit, working directory clean"
+    )
   end
 
   # Return Git status (git status --branch --porcelain --long) as an array.
