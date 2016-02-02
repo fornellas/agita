@@ -128,6 +128,28 @@ RSpec.describe Agita do
       end
     end
   end
+  context '#ensure_checked_out' do
+    let(:tagname) { 'test_tag' }
+    before(:example) do
+      run("git tag --annotate #{tagname} --message=RSpec")
+      run("git push --quiet origin #{tagname}")
+    end
+    context 'checked out at desired tag' do
+      before(:example) do
+        run("git checkout #{tagname} --quiet")
+      end
+      it 'does not raise' do
+        expect{subject.ensure_checked_out(tagname)}
+          .not_to raise_error
+      end
+    end
+    context 'at other status' do
+      it 'raises' do
+        expect{subject.ensure_checked_out(tagname)}
+          .to raise_error(RuntimeError)
+      end
+    end
+  end
   context '#commit' do
     let(:test_files) { ['file1', 'file2'] }
     let(:message) { 'commit message' }

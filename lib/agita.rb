@@ -16,12 +16,20 @@ class Agita
     end
   end
 
-  # Raise RuntimeError unless
+  # Raise RuntimeError unless at branch master, up to date with 'origin/master' and clean.
   def ensure_master_updated_clean
     ensure_status(
       "On branch master",
       "Your branch is up-to-date with 'origin/master'.",
       "nothing to commit, working directory clean"
+    )
+  end
+
+  # Raises RuntimeError unless checked out at tagname
+  def ensure_checked_out tagname
+    ensure_status(
+      "HEAD detached at #{tagname}",
+      "nothing to commit, working directory clean",
     )
   end
 
