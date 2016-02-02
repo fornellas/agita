@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.name             = 'agita'
   s.version          = Agita::VERSION
   s.summary          = 'Git commands / workflow helper.'
-  s.description      = 'Git commands / workflow helper.'
+  s.description      = 'Simple Gem that encapsulates some usual Git commands, to make Git workflows easier.'
   s.email            = 'fabio.ornellas@gmail.com'
   s.homepage         = 'https://github.com/fornellas/agita'
   s.license          = 'GPL-3.0'
